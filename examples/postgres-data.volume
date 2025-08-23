@@ -1,0 +1,17 @@
+# Example Podman Quadlet volume file
+# This file defines a persistent volume for PostgreSQL data
+
+[Unit]
+Description=PostgreSQL Data Volume
+
+[Volume]
+# Volume name (will be prefixed with systemd unit prefix)
+VolumeName=postgres-data
+
+# Labels for organization
+Label="app=postgres"
+Label="purpose=data-storage"
+Label="test.backup-policy=daily"
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+# Example Podman Quadlet container file
+# This file defines a PostgreSQL container that can be managed by systemd
+
+[Unit]
+Description=PostgreSQL Database Container
+After=local-fs.target
+Wants=network-online.target
+
+[Container]
+# Container image to use
+Image=docker.io/library/postgres:15-alpine
+
+# Environment variables
+Environment=POSTGRES_DB=myapp
+Environment=POSTGRES_USER=myuser
+Environment=POSTGRES_PASSWORD=mysecretpassword
+Environment=PGDATA=/var/lib/postgresql/data/pgdata
+
+# Port mapping
+PublishPort=5432:5432
+
+# Volume mounting
+Volume=postgres-data:/var/lib/postgresql/data:Z
+
+# Security settings
+User=postgres
+Group=postgres
+
+# Health check
+HealthCmd=/usr/local/bin/pg_isready -U myuser -d myapp
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
+HealthTimeout=10s
+
+# Auto-update settings
+AutoUpdate=registry
+Pull=newer
+
+# Labels for organization
+Label="app=postgres"
+Label="version=15"
+Label="environment=development"
+
+[Install]
+# Start automatically with the system
+WantedBy=multi-user.target default.target
