@@ -35,10 +35,25 @@ impl QuadletExtension {
     fn download_quadlet_lsp(&mut self) -> Result<zed::Command> {
         let (platform, arch) = zed::current_platform();
 
-        let os = match platform {
-            zed::Os::Mac => "darwin",
-            zed::Os::Linux => "linux",
-            zed::Os::Windows => "windows",
+        let (os, download_format, zed_format, binary_name) = match platform {
+            zed::Os::Mac => (
+                "darwin",
+                "tar.gz",
+                zed::DownloadedFileType::GzipTar,
+                "quadlet-lsp",
+            ),
+            zed::Os::Linux => (
+                "linux",
+                "tar.gz",
+                zed::DownloadedFileType::GzipTar,
+                "quadlet-lsp",
+            ),
+            zed::Os::Windows => (
+                "windows",
+                "zip",
+                zed::DownloadedFileType::Zip,
+                "quadlet-lsp.exe",
+            ),
         };
 
         let arch = match arch {
@@ -51,26 +66,16 @@ impl QuadletExtension {
         };
 
         let version = "v0.3.1";
-        let binary_name = if platform == zed::Os::Windows {
-            "quadlet-lsp.exe"
-        } else {
-            "quadlet-lsp"
-        };
-
         let download_url = format!(
-            "https://github.com/onlyati/quadlet-lsp/releases/download/{}/quadlet-lsp-{}-{}-{}.tar.gz",
-            version, version, os, arch
+            "https://github.com/onlyati/quadlet-lsp/releases/download/{}/quadlet-lsp-{}-{}-{}.{}",
+            version, version, os, arch, download_format
         );
 
         let version_dir = format!("quadlet-lsp-{}", version);
         let binary_path = format!("{}/{}", version_dir, binary_name);
 
-        zed::download_file(
-            &download_url,
-            &version_dir,
-            zed::DownloadedFileType::GzipTar,
-        )
-        .map_err(|e| format!("Failed to download quadlet-lsp: {e}"))?;
+        zed::download_file(&download_url, &version_dir, zed_format)
+            .map_err(|e| format!("Failed to download quadlet-lsp: {e}"))?;
 
         // Make the binary executable
         zed::make_file_executable(&binary_path)?;
