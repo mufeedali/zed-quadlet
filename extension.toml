@@ -1,7 +1,7 @@
 id = "quadlet"
 name = "Quadlet"
 description = "Support for Podman Quadlet files with quadlet-lsp"
-version = "0.1.1"
+version = "0.2.0"
 schema_version = 1
 authors = ["Mufeed Ali <me@mufeed.dev>"]
 repository = "https://github.com/mufeedali/zed-podman"
