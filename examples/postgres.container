@@ -1,5 +1,6 @@
 # Example Podman Quadlet container file
 # This file defines a PostgreSQL container that can be managed by systemd
+# This is NOT intended to work and probably doesn't.
 
 [Unit]
 Description=PostgreSQL Database Container
@@ -21,6 +22,8 @@ PublishPort=5432:5432
 
 # Volume mounting
 Volume=postgres-data:/var/lib/postgresql/data:Z
+# This should be a working mount
+Volume=%h/correct:/correct
 
 # Security settings
 User=postgres
@@ -41,6 +44,7 @@ Pull=newer
 Label="app=postgres"
 Label="version=15"
 Label="environment=development"
+Label="valid-label=test"
 
 [Install]
 # Start automatically with the system
