@@ -1,10 +1,10 @@
 id = "quadlet"
 name = "Quadlet"
 description = "Support for Podman Quadlet files with quadlet-lsp"
-version = "0.2.0"
+version = "0.2.1"
 schema_version = 1
 authors = ["Mufeed Ali <me@mufeed.dev>"]
-repository = "https://github.com/mufeedali/zed-podman"
+repository = "https://github.com/mufeedali/zed-quadlet"
 
 [language_servers.quadlet-lsp]
 name = "Quadlet LSP"
@@ -12,4 +12,4 @@ language = "Quadlet"
 
 [grammars.ini]
 repository = "https://github.com/justinmk/tree-sitter-ini"
-rev = "31899dfa3b91622ea39e5c0bcddc88f45a9a3cfe"
+rev = "32b31863f222bf22eb43b07d4e9be8017e36fb31"

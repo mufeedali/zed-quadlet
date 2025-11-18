@@ -65,7 +65,7 @@ impl QuadletExtension {
             }
         };
 
-        let version = "0.5.0";
+        let version = "0.6.0";
         let download_url = format!(
             "https://github.com/onlyati/quadlet-lsp/releases/download/v{}/quadlet-lsp-{}-{}-{}.{}",
             version, version, os, arch, download_format
