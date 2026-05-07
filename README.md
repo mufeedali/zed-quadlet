@@ -12,7 +12,8 @@ This extension recognizes and provides language support for the following Podman
 - `.image` - Image unit files
 - `.pod` - Pod unit files
 - `.build` - Build unit files
-- `.kube` - Kubernetes YAML unit files
+- `.kube` - Kubernetes Quadlet unit files
+- `.artifact` - Artifact unit files
 
 ### Install Extension
 
@@ -23,7 +24,7 @@ This extension recognizes and provides language support for the following Podman
 3. Run `zed: install dev extension`
 4. Select the directory containing this extension
 
-#### Option 2: Install from Published Extension (when available)
+#### Option 2: Install from Published Extension
 
 1. Open Zed
 2. Open the command palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Linux/Windows)

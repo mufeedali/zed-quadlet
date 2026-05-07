@@ -1,4 +1,6 @@
-use zed_extension_api::{self as zed, Result};
+use zed_extension_api::{self as zed, LanguageServerId, Result};
+
+const QUADLET_LSP_VERSION: &str = "0.7.3";
 
 struct QuadletExtension;
 
@@ -9,30 +11,30 @@ impl zed::Extension for QuadletExtension {
 
     fn language_server_command(
         &mut self,
-        language_server_id: &zed::LanguageServerId,
+        language_server_id: &LanguageServerId,
         worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
         match language_server_id.as_ref() {
-            "quadlet-lsp" => {
-                // Try to find quadlet-lsp in PATH first
-                if let Some(path) = worktree.which("quadlet-lsp") {
-                    return Ok(zed::Command {
-                        command: path,
-                        args: vec![],
-                        env: Default::default(),
-                    });
-                }
-
-                // If not found, try to download and install it
-                self.download_quadlet_lsp()
-            }
-            language_server_id => Err(format!("unknown language server: {language_server_id}"))?,
+            "quadlet-lsp" => Ok(zed::Command {
+                command: self.language_server_binary_path(language_server_id, worktree)?,
+                args: vec![],
+                env: Default::default(),
+            }),
+            id => Err(format!("unknown language server: {id}")),
         }
     }
 }
 
 impl QuadletExtension {
-    fn download_quadlet_lsp(&mut self) -> Result<zed::Command> {
+    fn language_server_binary_path(
+        &mut self,
+        language_server_id: &LanguageServerId,
+        worktree: &zed::Worktree,
+    ) -> Result<String> {
+        if let Some(path) = worktree.which("quadlet-lsp") {
+            return Ok(path);
+        }
+
         let (platform, arch) = zed::current_platform();
 
         let (os, download_format, zed_format, binary_name) = match platform {
@@ -59,32 +61,33 @@ impl QuadletExtension {
         let arch = match arch {
             zed::Architecture::Aarch64 => "arm64",
             zed::Architecture::X8664 => "amd64",
-            // x86 is not supported by `quadlet-lsp`
             zed::Architecture::X86 => {
                 return Err("quadlet-lsp does not support x86 architecture".into());
             }
         };
 
-        let version = "0.7.1";
-        let download_url = format!(
-            "https://github.com/onlyati/quadlet-lsp/releases/download/v{}/quadlet-lsp-{}-{}-{}.{}",
-            version, version, os, arch, download_format
+        let version_dir = format!("quadlet-lsp-{QUADLET_LSP_VERSION}");
+        let binary_path = format!("{version_dir}/{binary_name}");
+
+        if std::fs::metadata(&binary_path).is_ok_and(|m| m.is_file()) {
+            return Ok(binary_path);
+        }
+
+        zed::set_language_server_installation_status(
+            language_server_id,
+            &zed::LanguageServerInstallationStatus::Downloading,
         );
 
-        let version_dir = format!("quadlet-lsp-{}", version);
-        let binary_path = format!("{}/{}", version_dir, binary_name);
+        let download_url = format!(
+            "https://github.com/onlyati/quadlet-lsp/releases/download/v{QUADLET_LSP_VERSION}/quadlet-lsp-{QUADLET_LSP_VERSION}-{os}-{arch}.{download_format}"
+        );
 
         zed::download_file(&download_url, &version_dir, zed_format)
-            .map_err(|e| format!("Failed to download quadlet-lsp: {e}"))?;
+            .map_err(|e| format!("failed to download quadlet-lsp: {e}"))?;
 
-        // Make the binary executable
         zed::make_file_executable(&binary_path)?;
 
-        Ok(zed::Command {
-            command: binary_path,
-            args: vec![],
-            env: Default::default(),
-        })
+        Ok(binary_path)
     }
 }
 
