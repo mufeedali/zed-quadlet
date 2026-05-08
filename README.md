@@ -39,6 +39,24 @@ Once installed, the extension will automatically:
 - Provide syntax highlighting based on INI/systemd unit file syntax
 - Offer hover documentation, completions, and error checking
 
+### Configuration
+
+To use a local build instead of the auto-downloaded binary, set the path in your Zed settings (`settings.json`):
+
+```json
+{
+  "lsp": {
+    "quadlet-lsp": {
+      "binary": {
+        "path": "/path/to/quadlet-lsp"
+      }
+    }
+  }
+}
+```
+
+Note: quadlet-lsp reads its configuration from a `.quadletrc.json` file in the workspace root, not from LSP settings.
+
 ## Development
 
 Follow the dev extension installation instructions above and when you make changes, "Rebuild" the extension from Zed's extensions list.
